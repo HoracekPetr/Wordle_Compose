@@ -7,7 +7,10 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface WordDAO {
 
+    @Query("SELECT COUNT(*) FROM words")
+    suspend fun getRowCount(): Int
+
     @Query("SELECT * from words WHERE id = (:wordId)")
-    fun loadOneWord(wordId: Int): Flow<WordEntity>
+    suspend fun loadOneWord(wordId: Int): WordEntity
 
 }

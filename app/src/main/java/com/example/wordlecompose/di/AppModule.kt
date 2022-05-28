@@ -6,6 +6,8 @@ import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.example.wordlecompose.data.database.WordDAO
 import com.example.wordlecompose.data.database.WordDatabase
+import com.example.wordlecompose.data.repository.WordRepository
+import com.example.wordlecompose.data.repository.WordRepositoryImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -33,4 +35,9 @@ object AppModule {
         return database.getDao()
     }
 
+    @Singleton
+    @Provides
+    fun provideWordRepository(dao: WordDAO): WordRepository{
+        return WordRepositoryImpl(dao = dao)
+    }
 }
