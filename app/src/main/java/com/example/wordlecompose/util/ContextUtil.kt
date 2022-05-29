@@ -16,6 +16,7 @@ val Context.dataStore by dataStore(
 )
 
 object DateHandler {
+
     suspend fun updateDate(dataStore: DataStore<AppPreferences>) {
 
         val currentDate = getCurrentDate()
