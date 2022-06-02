@@ -29,6 +29,9 @@ class MainViewModel @Inject constructor(
     private val _wordState = mutableStateOf(Word())
     val wordState: State<Word> = _wordState
 
+    private val _isFlipEnabled = mutableStateOf(true)
+    val isFlipEnabled: State<Boolean> = _isFlipEnabled
+
     val preferences: Flow<AppPreferences> = dataStore.data
 
     init {
@@ -62,6 +65,10 @@ class MainViewModel @Inject constructor(
         )
 
         _isLoading.value = false
+    }
+
+    fun onButtonClick(){
+        _isFlipEnabled.value = !_isFlipEnabled.value
     }
 
 }
