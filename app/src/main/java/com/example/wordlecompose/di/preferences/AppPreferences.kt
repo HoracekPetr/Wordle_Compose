@@ -1,4 +1,4 @@
-package com.example
+package com.example.wordlecompose.di.preferences
 
 import androidx.datastore.core.Serializer
 import kotlinx.serialization.Serializable

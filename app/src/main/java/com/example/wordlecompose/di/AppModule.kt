@@ -1,9 +1,13 @@
 package com.example.wordlecompose.di
 
 import android.content.Context
+import androidx.datastore.core.DataStore
+import androidx.datastore.core.DataStoreFactory
+import androidx.datastore.core.Serializer
+import androidx.datastore.dataStoreFile
 import androidx.room.Room
-import androidx.room.RoomDatabase
-import androidx.sqlite.db.SupportSQLiteDatabase
+import com.example.wordlecompose.di.preferences.AppPreferences
+import com.example.wordlecompose.di.preferences.AppPreferencesSerializer
 import com.example.wordlecompose.data.database.WordDAO
 import com.example.wordlecompose.data.database.WordDatabase
 import com.example.wordlecompose.data.repository.WordRepository
@@ -39,5 +43,26 @@ object AppModule {
     @Provides
     fun provideWordRepository(dao: WordDAO): WordRepository{
         return WordRepositoryImpl(dao = dao)
+    }
+
+    @Singleton
+    @Provides
+    fun provideAppPreferences(): AppPreferences {
+        return AppPreferences()
+    }
+
+    @Singleton
+    @Provides
+    fun provideSerializer(): Serializer<AppPreferences>{
+        return AppPreferencesSerializer
+    }
+
+    @Singleton
+    @Provides
+    fun provideDataStore(@ApplicationContext context: Context, serializer: Serializer<AppPreferences>): DataStore<AppPreferences>{
+        return DataStoreFactory.create(
+            serializer = serializer,
+            produceFile = {context.dataStoreFile("wordle-preferences.json")}
+        )
     }
 }
