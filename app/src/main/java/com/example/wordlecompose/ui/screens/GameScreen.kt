@@ -12,13 +12,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.wordlecompose.ui.components.LetterRow
+import com.example.wordlecompose.ui.components.LetterRowColumn
 
 @Composable
 fun GameScreen(
     viewModel: GameScreenViewModel = hiltViewModel(),
 ) {
 
-    val todayWord = viewModel.wordState.value.word
+    val inputStates = viewModel.inputStates.value
+    val flipStates = viewModel.flipStates.value
+    val rowBackgroundStates = viewModel.rowBackgroundStates.value
 
     Box(
         modifier = Modifier
@@ -29,27 +32,20 @@ fun GameScreen(
             CircularProgressIndicator(Modifier.align(Alignment.Center))
         } else {
             Column(Modifier.matchParentSize()) {
-                LetterRow(
-                    inputWord = viewModel.textInputState.value,
-                    enabled = viewModel.isFlipEnabled.value,
-                    bgColorState = viewModel.letterBgColors.value
-                )
+
+                LetterRowColumn(inputStates = inputStates, flipStates = flipStates, rowBackgroundStates = rowBackgroundStates)
 
                 Spacer(modifier = Modifier.size(32.dp))
 
                 OutlinedTextField(
                     label = { Text(text = "Word") },
                     value = viewModel.textInputState.value.uppercase(),
-                    onValueChange = { if (it.length <= 5) viewModel.setInputState(it) })
+                    onValueChange = { if (it.length <= 5) viewModel.onEvent(GameScreenEvent.EnteredWord(it)) })
 
                 Spacer(modifier = Modifier.size(16.dp))
 
-                Button(onClick = { viewModel.onButtonClick() }) {
+                Button(onClick = { viewModel.onEvent(GameScreenEvent.ConfirmButtonClicked) }) {
                     Text(text = "Flip")
-                    Spacer(modifier = Modifier.size(12.dp))
-                    Canvas(modifier = Modifier.size(30.dp)){
-                        drawCircle(color = viewModel.letterBgColors.value.bgColor1)
-                    }
                 }
             }
         }
