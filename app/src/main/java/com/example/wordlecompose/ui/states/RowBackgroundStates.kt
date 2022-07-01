@@ -1,4 +1,4 @@
-package com.example.wordlecompose.ui.screens.states
+package com.example.wordlecompose.ui.states
 
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf

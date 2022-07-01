@@ -1,4 +1,4 @@
-package com.example.wordlecompose.ui.screens.states
+package com.example.wordlecompose.ui.states
 
 data class InputStates(
     val input1State: String = "",

@@ -4,17 +4,16 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.toUpperCase
 import androidx.datastore.core.DataStore
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.wordlecompose.data.database.Word
 import com.example.wordlecompose.data.repository.WordRepository
 import com.example.wordlecompose.di.preferences.AppPreferences
-import com.example.wordlecompose.ui.screens.states.BGColorState
-import com.example.wordlecompose.ui.screens.states.FlipStates
-import com.example.wordlecompose.ui.screens.states.InputStates
-import com.example.wordlecompose.ui.screens.states.RowBackgroundStates
+import com.example.wordlecompose.ui.states.BGColorState
+import com.example.wordlecompose.ui.states.FlipStates
+import com.example.wordlecompose.ui.states.InputStates
+import com.example.wordlecompose.ui.states.RowBackgroundStates
 import com.example.wordlecompose.util.DateHandler
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
@@ -139,42 +138,43 @@ class GameScreenViewModel @Inject constructor(
             is GameScreenEvent.EnteredWord -> {
                 when(_currentRow.value){
                     1 -> {
-                        _textInputState.value = event.input.uppercase()
+                        _textInputState.value += event.input.uppercase()
                         _inputStates.value = _inputStates.value.copy(
                             input1State = _textInputState.value
                         )
+                        println(_textInputState.value)
                     }
 
                     2 -> {
-                        _textInputState.value = event.input.uppercase()
+                        _textInputState.value += event.input.uppercase()
                         _inputStates.value = _inputStates.value.copy(
                             input2State = _textInputState.value
                         )
                     }
 
                     3 -> {
-                        _textInputState.value = event.input.uppercase()
+                        _textInputState.value += event.input.uppercase()
                         _inputStates.value = _inputStates.value.copy(
                             input3State = _textInputState.value
                         )
                     }
 
                     4 -> {
-                        _textInputState.value = event.input.uppercase()
+                        _textInputState.value += event.input.uppercase()
                         _inputStates.value = _inputStates.value.copy(
                             input4State = _textInputState.value.uppercase()
                         )
                     }
 
                     5 -> {
-                        _textInputState.value = event.input.uppercase()
+                        _textInputState.value += event.input.uppercase()
                         _inputStates.value = _inputStates.value.copy(
                             input5State = _textInputState.value
                         )
                     }
 
                     6 -> {
-                        _textInputState.value = event.input.uppercase()
+                        _textInputState.value += event.input.uppercase()
                         _inputStates.value = _inputStates.value.copy(
                             input6State = _textInputState.value
                         )
@@ -182,6 +182,52 @@ class GameScreenViewModel @Inject constructor(
 
                     else -> {
 
+                    }
+                }
+            }
+            is GameScreenEvent.BackspaceWord -> {
+                when(currentRow.value){
+                    1 -> {
+                        _textInputState.value = _textInputState.value.dropLast(1)
+                        _inputStates.value = _inputStates.value.copy(
+                            input1State = _textInputState.value
+                        )
+                        println(_textInputState.value)
+                    }
+                    2 -> {
+                        _textInputState.value = _textInputState.value.dropLast(1)
+                        _inputStates.value = _inputStates.value.copy(
+                            input2State = _textInputState.value
+                        )
+                        println(_textInputState.value)
+                    }
+                    3 -> {
+                        _textInputState.value = _textInputState.value.dropLast(1)
+                        _inputStates.value = _inputStates.value.copy(
+                            input3State = _textInputState.value
+                        )
+                        println(_textInputState.value)
+                    }
+                    4 -> {
+                        _textInputState.value = _textInputState.value.dropLast(1)
+                        _inputStates.value = _inputStates.value.copy(
+                            input4State = _textInputState.value
+                        )
+                        println(_textInputState.value)
+                    }
+                    5 -> {
+                        _textInputState.value = _textInputState.value.dropLast(1)
+                        _inputStates.value = _inputStates.value.copy(
+                            input5State = _textInputState.value
+                        )
+                        println(_textInputState.value)
+                    }
+                    6 -> {
+                        _textInputState.value = _textInputState.value.dropLast(1)
+                        _inputStates.value = _inputStates.value.copy(
+                            input6State = _textInputState.value
+                        )
+                        println(_textInputState.value)
                     }
                 }
             }

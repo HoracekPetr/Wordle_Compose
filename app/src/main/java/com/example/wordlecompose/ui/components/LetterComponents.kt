@@ -5,9 +5,11 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -17,6 +19,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
@@ -25,30 +28,63 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlin.math.abs
 
+enum class BoxType {
+    GAME,
+    KEYBOARD
+}
+
 @Composable
-fun LetterBox(
-    boxSize: Dp = 70.dp,
+fun LetterIconBox(
+    boxType: BoxType,
+    boxSize: Dp = 65.dp,
     textSize: TextUnit = 40.sp,
-    text: String,
+    text: String = "",
+    icon: ImageVector? = null,
     textColor: Color = Color.Black,
     backgroundColor: Color = Color.Transparent,
     borderColor: Color = Color.DarkGray,
     borderWidth: Dp = 2.dp,
-    letterBoxShape: Shape = RoundedCornerShape(2.dp)
+    letterBoxShape: Shape = RoundedCornerShape(2.dp),
+    onKeyboardClick: (String) -> Unit = {},
+    onBoxClick: () -> Unit = {}
 ) {
-    Box(
-        modifier = Modifier
-            .clip(letterBoxShape)
-            .background(color = backgroundColor)
-            .size(width = boxSize, height = boxSize)
-            .border(width = borderWidth, color = borderColor),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(
-            text = text,
-            color = textColor,
-            style = TextStyle(fontWeight = FontWeight.Bold, fontSize = textSize)
-        )
+    if (boxType == BoxType.GAME) {
+        Box(
+            modifier = Modifier
+                .clip(letterBoxShape)
+                .background(color = backgroundColor)
+                .size(width = boxSize, height = boxSize)
+                .border(width = borderWidth, color = borderColor),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = text,
+                color = textColor,
+                style = TextStyle(fontWeight = FontWeight.Bold, fontSize = textSize)
+            )
+        }
+    }
+
+    if (boxType == BoxType.KEYBOARD) {
+        Box(
+            modifier = Modifier
+                .clip(letterBoxShape)
+                .background(color = backgroundColor)
+                .size(width = boxSize, height = boxSize)
+                .border(width = borderWidth, color = borderColor)
+                .clickable { if(icon != null) onBoxClick() else onKeyboardClick(text) },
+            contentAlignment = Alignment.Center
+        ) {
+            if (icon != null) {
+                Icon(imageVector = icon, contentDescription = "Icon")
+            } else {
+                Text(
+                    text = text,
+                    color = textColor,
+                    style = TextStyle(fontWeight = FontWeight.Bold, fontSize = textSize)
+                )
+            }
+        }
     }
 }
 
@@ -145,10 +181,11 @@ fun RotatingDoubleSide(
         flipType = FlipType.HORIZONTAL,
         rotationX = rotationX,
         front = {
-            LetterBox(text = letter)
+            LetterIconBox(boxType = BoxType.GAME, text = letter)
         },
         back = {
-            LetterBox(
+            LetterIconBox(
+                boxType = BoxType.GAME,
                 text = letter,
                 backgroundColor = backgroundColor,
                 textColor = Color.White
