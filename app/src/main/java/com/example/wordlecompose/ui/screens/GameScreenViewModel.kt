@@ -2,6 +2,7 @@ package com.example.wordlecompose.ui.screens
 
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.Color
 import androidx.datastore.core.DataStore
@@ -10,6 +11,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.wordlecompose.data.database.Word
 import com.example.wordlecompose.data.repository.WordRepository
 import com.example.wordlecompose.di.preferences.AppPreferences
+import com.example.wordlecompose.ui.components.model.Key
 import com.example.wordlecompose.ui.states.BGColorState
 import com.example.wordlecompose.ui.states.FlipStates
 import com.example.wordlecompose.ui.states.InputStates
@@ -48,12 +50,18 @@ class GameScreenViewModel @Inject constructor(
     private val _currentRow = mutableStateOf(1)
     val currentRow: State<Int> = _currentRow
 
+    private val _keyboardKeys = mutableStateListOf<Key>()
+    val keyboardKeys = _keyboardKeys
+
     val preferences: Flow<AppPreferences> = dataStore.data
 
     init {
         viewModelScope.launch {
             getWordForToday()
             updateDate()
+        }
+        ('A'..'Z').forEach { letter ->
+            _keyboardKeys.add(Key(letter = letter, bgColor = mutableStateOf(Color.Transparent)))
         }
     }
 
@@ -70,6 +78,8 @@ class GameScreenViewModel @Inject constructor(
                                 row1FlipState = true
                             )
 
+                            setKeyboardLetterColor()
+
                             _textInputState.value = ""
 
                             _currentRow.value++
@@ -80,6 +90,8 @@ class GameScreenViewModel @Inject constructor(
                             _flipStates.value = _flipStates.value.copy(
                                 row2FlipState = true
                             )
+
+                            setKeyboardLetterColor()
 
                             _textInputState.value = ""
 
@@ -92,6 +104,8 @@ class GameScreenViewModel @Inject constructor(
                                 row3FlipState = true
                             )
 
+                            setKeyboardLetterColor()
+
                             _textInputState.value = ""
 
                             _currentRow.value++
@@ -102,6 +116,8 @@ class GameScreenViewModel @Inject constructor(
                             _flipStates.value = _flipStates.value.copy(
                                 row4FlipState = true
                             )
+
+                            setKeyboardLetterColor()
 
                             _textInputState.value = ""
 
@@ -114,6 +130,8 @@ class GameScreenViewModel @Inject constructor(
                                 row5FlipState = true
                             )
 
+                            setKeyboardLetterColor()
+
                             _textInputState.value = ""
 
                             _currentRow.value++
@@ -124,6 +142,8 @@ class GameScreenViewModel @Inject constructor(
                             _flipStates.value = _flipStates.value.copy(
                                 row6FlipState = true
                             )
+
+                            setKeyboardLetterColor()
 
                             _textInputState.value = ""
 
@@ -308,5 +328,27 @@ class GameScreenViewModel @Inject constructor(
             word.contains(inputLetter) -> Color(251, 192, 45, 255)
             else -> Color(194, 194, 194, 255)
         }
+    }
+
+    private fun setKeyboardLetterColor(){
+       for(i in 0 until _textInputState.value.length){
+           val currentKey = _keyboardKeys.find { it.letter == _textInputState.value[i] }
+
+           currentKey?.let {
+               when{
+                   _textInputState.value[i] == _wordState.value.word?.get(i) ?: "" -> {
+                       it.bgColor.value = Color(104, 159, 56, 255)
+                   }
+
+                   _wordState.value.word?.contains(_textInputState.value[i]) ?: false -> {
+                       it.bgColor.value = Color(251, 192, 45, 255)
+                   }
+
+                   else -> {
+                       it.bgColor.value = Color(194, 194, 194, 255)
+                   }
+               }
+           }
+       }
     }
 }
