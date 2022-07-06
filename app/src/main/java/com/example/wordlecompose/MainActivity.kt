@@ -13,10 +13,6 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-
-/*            val currentDate =
-                viewModel.preferences.collectAsState(initial = AppPreferences()).value.date*/
-
             WordleComposeTheme {
                 GameScreen()
             }

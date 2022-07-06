@@ -53,6 +53,9 @@ class GameScreenViewModel @Inject constructor(
     private val _keyboardKeys = mutableStateListOf<Key>()
     val keyboardKeys = _keyboardKeys
 
+    private val _isGameWon = mutableStateOf(false)
+    val isGameWon = _isGameWon
+
     val preferences: Flow<AppPreferences> = dataStore.data
 
     init {
@@ -251,6 +254,9 @@ class GameScreenViewModel @Inject constructor(
                     }
                 }
             }
+            GameScreenEvent.ClosedWinDialog -> {
+                _isGameWon.value = false
+            }
         }
     }
 
@@ -350,5 +356,17 @@ class GameScreenViewModel @Inject constructor(
                }
            }
        }
+
+        checkWinConditions()
+    }
+
+    private fun checkWinConditions(){
+
+        if(_wordState.value.word != _textInputState.value){
+            _isGameWon.value = false
+            return
+        }
+
+        _isGameWon.value = true
     }
 }
