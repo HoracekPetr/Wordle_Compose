@@ -12,10 +12,7 @@ import com.example.wordlecompose.data.database.Word
 import com.example.wordlecompose.data.repository.WordRepository
 import com.example.wordlecompose.di.preferences.AppPreferences
 import com.example.wordlecompose.ui.components.model.Key
-import com.example.wordlecompose.ui.states.BGColorState
-import com.example.wordlecompose.ui.states.FlipStates
-import com.example.wordlecompose.ui.states.InputStates
-import com.example.wordlecompose.ui.states.RowBackgroundStates
+import com.example.wordlecompose.ui.states.*
 import com.example.wordlecompose.util.DateHandler
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
@@ -45,6 +42,9 @@ class GameScreenViewModel @Inject constructor(
     private val _rowBackgroundStates = mutableStateOf(RowBackgroundStates())
     val rowBackgroundStates = _rowBackgroundStates
 
+    private val _rowErrorStates = mutableStateOf(RowErrorStates())
+    val rowErrorStates = _rowErrorStates
+
     private val _inputStates = mutableStateOf(InputStates())
     val inputStates = _inputStates
 
@@ -57,7 +57,7 @@ class GameScreenViewModel @Inject constructor(
     private val _isGameWon = mutableStateOf(false)
     val isGameWon = _isGameWon
 
-    val preferences: Flow<AppPreferences> = dataStore.data
+    //val preferences: Flow<AppPreferences> = dataStore.data
 
     init {
         viewModelScope.launch {
@@ -78,37 +78,43 @@ class GameScreenViewModel @Inject constructor(
                             1 -> {
                                 onConfirmButtonClick(
                                     bgColorState = _rowBackgroundStates.value.row1BGState,
-                                    flipState = _flipStates.value.row1FlipState
+                                    flipState = _flipStates.value.row1FlipState,
+                                    rowErrorState = _rowErrorStates.value.row1Error
                                 )
                             }
                             2 -> {
                                 onConfirmButtonClick(
                                     bgColorState = _rowBackgroundStates.value.row2BGState,
-                                    flipState = _flipStates.value.row2FlipState
+                                    flipState = _flipStates.value.row2FlipState,
+                                    rowErrorState = _rowErrorStates.value.row2Error
                                 )
                             }
                             3 -> {
                                 onConfirmButtonClick(
                                     bgColorState = _rowBackgroundStates.value.row3BGState,
-                                    flipState = _flipStates.value.row3FlipState
+                                    flipState = _flipStates.value.row3FlipState,
+                                    rowErrorState = _rowErrorStates.value.row3Error
                                 )
                             }
                             4 -> {
                                 onConfirmButtonClick(
                                     bgColorState = _rowBackgroundStates.value.row4BGState,
-                                    flipState = _flipStates.value.row4FlipState
+                                    flipState = _flipStates.value.row4FlipState,
+                                    rowErrorState = _rowErrorStates.value.row4Error
                                 )
                             }
                             5 -> {
                                 onConfirmButtonClick(
                                     bgColorState = _rowBackgroundStates.value.row5BGState,
-                                    flipState = _flipStates.value.row5FlipState
+                                    flipState = _flipStates.value.row5FlipState,
+                                    rowErrorState = _rowErrorStates.value.row5Error
                                 )
                             }
                             6 -> {
                                 onConfirmButtonClick(
                                     bgColorState = _rowBackgroundStates.value.row6BGState,
-                                    flipState = _flipStates.value.row6FlipState
+                                    flipState = _flipStates.value.row6FlipState,
+                                    rowErrorState = _rowErrorStates.value.row6Error
                                 )
                             }
                             else -> {
@@ -287,8 +293,6 @@ class GameScreenViewModel @Inject constructor(
 
 
     private fun setColor(inputLetter: Char, wordLetter: Char, word: String): Color {
-        println("INPUT LETTER: $inputLetter")
-        println("WORD LETTER: $wordLetter")
         return when {
             inputLetter == wordLetter -> Color(104, 159, 56, 255)
             word.contains(inputLetter) -> Color(251, 192, 45, 255)
@@ -333,12 +337,14 @@ class GameScreenViewModel @Inject constructor(
 
     private suspend fun onConfirmButtonClick(
         bgColorState: MutableState<BGColorState>,
-        flipState: MutableState<Boolean>
+        flipState: MutableState<Boolean>,
+        rowErrorState: MutableState<Boolean>
     ) {
-        println("Start")
         val wordCheckValue = checkIfWordExists(inputWord = _textInputState.value.lowercase())
-        println("Word check: $wordCheckValue")
         if (!wordCheckValue) {
+            rowErrorState.value = true
+            delay(500)
+            rowErrorState.value = false
             return
         }
         setBgColors(rowBGColorState = bgColorState)

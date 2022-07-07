@@ -34,6 +34,7 @@ fun GameScreen(
     val inputStates = viewModel.inputStates.value
     val flipStates = viewModel.flipStates.value
     val rowBackgroundStates = viewModel.rowBackgroundStates.value
+    val rowErrorStates = viewModel.rowErrorStates.value
 
 
     Box(
@@ -95,17 +96,17 @@ fun GameScreen(
                 LetterRowColumn(
                     inputStates = inputStates,
                     flipStates = flipStates,
-                    rowBackgroundStates = rowBackgroundStates
+                    rowBackgroundStates = rowBackgroundStates,
+                    rowErrorStates = rowErrorStates
                 )
 
                 Spacer(modifier = Modifier.size(18.dp))
 
                 Keyboard(
                     modifier = Modifier.align(alignment = CenterHorizontally),
-                    //keyboardLetters = ('A'..'Z').toList(),
                     keyboardKeys = viewModel.keyboardKeys,
                     onKeyboardClick = {
-                        if (viewModel.textInputState.value.length <= 5) {
+                        if (viewModel.textInputState.value.length <= 4) {
                             viewModel.onEvent(GameScreenEvent.EnteredWord(input = it))
                         }
                     },

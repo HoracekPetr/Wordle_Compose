@@ -1,5 +1,6 @@
 package com.example.wordlecompose.ui.components
 
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.updateTransition
@@ -72,7 +73,7 @@ fun LetterIconBox(
                 .background(color = backgroundColor)
                 .size(width = boxSize, height = boxSize)
                 .border(width = borderWidth, color = borderColor)
-                .clickable { if(icon != null) onBoxClick() else onKeyboardClick(text) },
+                .clickable { if (icon != null) onBoxClick() else onKeyboardClick(text) },
             contentAlignment = Alignment.Center
         ) {
             if (icon != null) {
@@ -123,9 +124,6 @@ fun DoubleSideLetterBox(
             if (flipType == FlipType.VERTICAL)
                 rotationY - 180
             else
-            // Need to negative value, suspecting a bug on rotation when a flipped
-            // horizontally card is rotating left to right, it will reverse
-            // hence need to negate it
                 -rotationY
         Box(
             Modifier
@@ -162,33 +160,53 @@ fun RotatingDoubleSide(
     delay: Int,
     letter: String,
     flipEnabled: Boolean,
-    backgroundColor: Color
+    backgroundColor: Color,
+    isError: Boolean
 ) {
 
-    val transition = updateTransition(targetState = flipEnabled, label = "")
+    if(!isError){
+        val transition = updateTransition(targetState = flipEnabled, label = "")
 
-    val rotationX by transition.animateFloat(
-        transitionSpec = { tween(delayMillis = delay, durationMillis = 200) },
-        label = ""
-    ) { enabled ->
-        when (enabled) {
-            true -> 180f
-            false -> 0f
+        val rotationX by transition.animateFloat(
+            transitionSpec = { tween(delayMillis = delay, durationMillis = 200) },
+            label = ""
+        ) { enabled ->
+            when (enabled) {
+                true -> 180f
+                false -> 0f
+            }
         }
-    }
 
-    DoubleSideLetterBox(
-        flipType = FlipType.HORIZONTAL,
-        rotationX = rotationX,
-        front = {
-            LetterIconBox(boxType = BoxType.GAME, text = letter)
-        },
-        back = {
-            LetterIconBox(
-                boxType = BoxType.GAME,
-                text = letter,
-                backgroundColor = backgroundColor,
-                textColor = Color.White
-            )
-        })
+        DoubleSideLetterBox(
+            flipType = FlipType.HORIZONTAL,
+            rotationX = rotationX,
+            front = {
+                LetterIconBox(boxType = BoxType.GAME, text = letter)
+            },
+            back = {
+                LetterIconBox(
+                    boxType = BoxType.GAME,
+                    text = letter,
+                    backgroundColor = backgroundColor,
+                    textColor = Color.White
+                )
+            })
+    } else {
+
+        val errorColor = animateColorAsState(
+            targetValue = if(isError) Color(211, 47, 47, 255) else Color.Transparent
+        )
+
+        DoubleSideLetterBox(
+            flipType = FlipType.HORIZONTAL,
+            front = {
+                LetterIconBox(boxType = BoxType.GAME, text = letter, backgroundColor = errorColor.value)
+            },
+            back = {
+                LetterIconBox(
+                    boxType = BoxType.GAME,
+                    text = letter
+                )
+            })
+    }
 }
