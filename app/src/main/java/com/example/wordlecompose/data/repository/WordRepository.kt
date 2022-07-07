@@ -8,4 +8,6 @@ interface WordRepository {
     suspend fun loadOneWord(id: Int): Word
 
     suspend fun getRowCount(): Int
+
+    suspend fun checkIfWordExists(inputWord: String): Boolean
 }

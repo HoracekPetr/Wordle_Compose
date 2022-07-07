@@ -48,7 +48,6 @@ fun GameScreen(
 
                 AnimatedVisibility(
                     visible = viewModel.isGameWon.value,
-
                 ) {
                     Dialog(onDismissRequest = { viewModel.onEvent(GameScreenEvent.ClosedWinDialog) }) {
                         Surface(

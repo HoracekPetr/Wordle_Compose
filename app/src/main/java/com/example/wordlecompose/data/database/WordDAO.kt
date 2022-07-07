@@ -13,4 +13,7 @@ interface WordDAO {
     @Query("SELECT * from words WHERE id = (:wordId)")
     suspend fun loadOneWord(wordId: Int): WordEntity
 
+    @Query("SELECT EXISTS(SELECT * FROM words WHERE word = (:inputWord))")
+    suspend fun checkIfWordExists(inputWord: String): Boolean
+
 }

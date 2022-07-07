@@ -69,11 +69,11 @@ fun LetterRowColumn(
     rowBackgroundStates: RowBackgroundStates
 ) {
    Column(modifier = modifier.fillMaxWidth()) {
-       LetterRow(inputWord = inputStates.input1State, flipEnabled = flipStates.row1FlipState, bgColorState = rowBackgroundStates.row1BGState.value)
-       LetterRow(inputWord = inputStates.input2State, flipEnabled = flipStates.row2FlipState, bgColorState = rowBackgroundStates.row2BGState.value)
-       LetterRow(inputWord = inputStates.input3State, flipEnabled = flipStates.row3FlipState, bgColorState = rowBackgroundStates.row3BGState.value)
-       LetterRow(inputWord = inputStates.input4State, flipEnabled = flipStates.row4FlipState, bgColorState = rowBackgroundStates.row4BGState.value)
-       LetterRow(inputWord = inputStates.input5State, flipEnabled = flipStates.row5FlipState, bgColorState = rowBackgroundStates.row5BGState.value)
-       LetterRow(inputWord = inputStates.input6State, flipEnabled = flipStates.row6FlipState, bgColorState = rowBackgroundStates.row6BGState.value)
+       LetterRow(inputWord = inputStates.input1State, flipEnabled = flipStates.row1FlipState.value, bgColorState = rowBackgroundStates.row1BGState.value)
+       LetterRow(inputWord = inputStates.input2State, flipEnabled = flipStates.row2FlipState.value, bgColorState = rowBackgroundStates.row2BGState.value)
+       LetterRow(inputWord = inputStates.input3State, flipEnabled = flipStates.row3FlipState.value, bgColorState = rowBackgroundStates.row3BGState.value)
+       LetterRow(inputWord = inputStates.input4State, flipEnabled = flipStates.row4FlipState.value, bgColorState = rowBackgroundStates.row4BGState.value)
+       LetterRow(inputWord = inputStates.input5State, flipEnabled = flipStates.row5FlipState.value, bgColorState = rowBackgroundStates.row5BGState.value)
+       LetterRow(inputWord = inputStates.input6State, flipEnabled = flipStates.row6FlipState.value, bgColorState = rowBackgroundStates.row6BGState.value)
    }
 }

@@ -18,6 +18,7 @@ import com.example.wordlecompose.ui.states.InputStates
 import com.example.wordlecompose.ui.states.RowBackgroundStates
 import com.example.wordlecompose.util.DateHandler
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -68,98 +69,57 @@ class GameScreenViewModel @Inject constructor(
         }
     }
 
-    fun onEvent(event: GameScreenEvent){
-        when(event){
+    fun onEvent(event: GameScreenEvent) {
+        when (event) {
             is GameScreenEvent.ConfirmButtonClicked -> {
-                if (_textInputState.value.length == _wordState.value.word?.length) {
+                viewModelScope.launch {
+                    if (_textInputState.value.length == _wordState.value.word?.length) {
+                        when (_currentRow.value) {
+                            1 -> {
+                                onConfirmButtonClick(
+                                    bgColorState = _rowBackgroundStates.value.row1BGState,
+                                    flipState = _flipStates.value.row1FlipState
+                                )
+                            }
+                            2 -> {
+                                onConfirmButtonClick(
+                                    bgColorState = _rowBackgroundStates.value.row2BGState,
+                                    flipState = _flipStates.value.row2FlipState
+                                )
+                            }
+                            3 -> {
+                                onConfirmButtonClick(
+                                    bgColorState = _rowBackgroundStates.value.row3BGState,
+                                    flipState = _flipStates.value.row3FlipState
+                                )
+                            }
+                            4 -> {
+                                onConfirmButtonClick(
+                                    bgColorState = _rowBackgroundStates.value.row4BGState,
+                                    flipState = _flipStates.value.row4FlipState
+                                )
+                            }
+                            5 -> {
+                                onConfirmButtonClick(
+                                    bgColorState = _rowBackgroundStates.value.row5BGState,
+                                    flipState = _flipStates.value.row5FlipState
+                                )
+                            }
+                            6 -> {
+                                onConfirmButtonClick(
+                                    bgColorState = _rowBackgroundStates.value.row6BGState,
+                                    flipState = _flipStates.value.row6FlipState
+                                )
+                            }
+                            else -> {
 
-                    when(_currentRow.value){
-                        1 -> {
-                            setBgColors(rowBGColorState = _rowBackgroundStates.value.row1BGState)
-
-                            _flipStates.value = _flipStates.value.copy(
-                                row1FlipState = true
-                            )
-
-                            setKeyboardLetterColor()
-
-                            _textInputState.value = ""
-
-                            _currentRow.value++
-                        }
-                        2 -> {
-                            setBgColors(rowBGColorState = _rowBackgroundStates.value.row2BGState)
-
-                            _flipStates.value = _flipStates.value.copy(
-                                row2FlipState = true
-                            )
-
-                            setKeyboardLetterColor()
-
-                            _textInputState.value = ""
-
-                            _currentRow.value++
-                        }
-                        3 -> {
-                            setBgColors(rowBGColorState = _rowBackgroundStates.value.row3BGState)
-
-                            _flipStates.value = _flipStates.value.copy(
-                                row3FlipState = true
-                            )
-
-                            setKeyboardLetterColor()
-
-                            _textInputState.value = ""
-
-                            _currentRow.value++
-                        }
-                        4 -> {
-                            setBgColors(rowBGColorState = _rowBackgroundStates.value.row4BGState)
-
-                            _flipStates.value = _flipStates.value.copy(
-                                row4FlipState = true
-                            )
-
-                            setKeyboardLetterColor()
-
-                            _textInputState.value = ""
-
-                            _currentRow.value++
-                        }
-                        5 -> {
-                            setBgColors(rowBGColorState = _rowBackgroundStates.value.row5BGState)
-
-                            _flipStates.value = _flipStates.value.copy(
-                                row5FlipState = true
-                            )
-
-                            setKeyboardLetterColor()
-
-                            _textInputState.value = ""
-
-                            _currentRow.value++
-                        }
-                        6 -> {
-                            setBgColors(rowBGColorState = _rowBackgroundStates.value.row6BGState)
-
-                            _flipStates.value = _flipStates.value.copy(
-                                row6FlipState = true
-                            )
-
-                            setKeyboardLetterColor()
-
-                            _textInputState.value = ""
-
-                            _currentRow.value++
-                        }
-                        else -> {
-
+                            }
                         }
                     }
                 }
             }
             is GameScreenEvent.EnteredWord -> {
-                when(_currentRow.value){
+                when (_currentRow.value) {
                     1 -> {
                         _textInputState.value += event.input.uppercase()
                         _inputStates.value = _inputStates.value.copy(
@@ -209,7 +169,7 @@ class GameScreenViewModel @Inject constructor(
                 }
             }
             is GameScreenEvent.BackspaceWord -> {
-                when(currentRow.value){
+                when (currentRow.value) {
                     1 -> {
                         _textInputState.value = _textInputState.value.dropLast(1)
                         _inputStates.value = _inputStates.value.copy(
@@ -296,7 +256,7 @@ class GameScreenViewModel @Inject constructor(
 
 
     private fun setBgColors(rowBGColorState: MutableState<BGColorState>) {
-         rowBGColorState.value = rowBGColorState.value.copy(
+        rowBGColorState.value = rowBGColorState.value.copy(
             bgColor1 = setColor(
                 inputLetter = _textInputState.value[0],
                 wordLetter = _wordState.value.word?.get(0) ?: Char(0),
@@ -336,37 +296,57 @@ class GameScreenViewModel @Inject constructor(
         }
     }
 
-    private fun setKeyboardLetterColor(){
-       for(i in 0 until _textInputState.value.length){
-           val currentKey = _keyboardKeys.find { it.letter == _textInputState.value[i] }
+    private fun setKeyboardLetterColor() {
+        for (i in 0 until _textInputState.value.length) {
+            val currentKey = _keyboardKeys.find { it.letter == _textInputState.value[i] }
 
-           currentKey?.let {
-               when{
-                   _textInputState.value[i] == _wordState.value.word?.get(i) ?: "" -> {
-                       it.bgColor.value = Color(104, 159, 56, 255)
-                   }
+            currentKey?.let {
+                when {
+                    _textInputState.value[i] == _wordState.value.word?.get(i) ?: "" -> {
+                        it.bgColor.value = Color(104, 159, 56, 255)
+                    }
 
-                   _wordState.value.word?.contains(_textInputState.value[i]) ?: false -> {
-                       it.bgColor.value = Color(251, 192, 45, 255)
-                   }
+                    _wordState.value.word?.contains(_textInputState.value[i]) ?: false -> {
+                        it.bgColor.value = Color(251, 192, 45, 255)
+                    }
 
-                   else -> {
-                       it.bgColor.value = Color(194, 194, 194, 255)
-                   }
-               }
-           }
-       }
-
-        checkWinConditions()
+                    else -> {
+                        it.bgColor.value = Color(194, 194, 194, 255)
+                    }
+                }
+            }
+        }
     }
 
-    private fun checkWinConditions(){
-
-        if(_wordState.value.word != _textInputState.value){
+    private fun checkWinConditions() {
+        if (_wordState.value.word != _textInputState.value) {
             _isGameWon.value = false
             return
         }
-
         _isGameWon.value = true
+        println(_isGameWon.value)
+    }
+
+    private suspend fun checkIfWordExists(inputWord: String): Boolean {
+        return repository.checkIfWordExists(inputWord = inputWord)
+    }
+
+    private suspend fun onConfirmButtonClick(
+        bgColorState: MutableState<BGColorState>,
+        flipState: MutableState<Boolean>
+    ) {
+        println("Start")
+        val wordCheckValue = checkIfWordExists(inputWord = _textInputState.value.lowercase())
+        println("Word check: $wordCheckValue")
+        if (!wordCheckValue) {
+            return
+        }
+        setBgColors(rowBGColorState = bgColorState)
+        flipState.value = true
+        setKeyboardLetterColor()
+        delay(1200)
+        checkWinConditions()
+        _textInputState.value = ""
+        _currentRow.value++
     }
 }

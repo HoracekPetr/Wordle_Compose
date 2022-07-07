@@ -15,4 +15,8 @@ class WordRepositoryImpl(
     override suspend fun getRowCount(): Int {
         return dao.getRowCount()
     }
+
+    override suspend fun checkIfWordExists(inputWord: String): Boolean {
+        return dao.checkIfWordExists(inputWord = inputWord)
+    }
 }
