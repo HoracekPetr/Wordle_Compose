@@ -2,5 +2,9 @@
     <string name="app_name">Wordle Compose</string>
     <string name="congrats">Congratulations! You have correctly guessed today\'s word!</string>
     <string name="awesome">Awesome!</string>
+    <string name="okay">Okay…</string>
     <string name="todayword">"Today's word was: "</string>
+    <string name="toobad">Too bad! You have failed to guess today \'s word…</string>
+    <string name="guessed">You have already guessed today! Try again tomorrow.</string>
+    <string name="undestood">Understood!</string>
 </resources>

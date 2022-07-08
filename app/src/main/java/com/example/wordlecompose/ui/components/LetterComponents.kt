@@ -27,12 +27,11 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.wordlecompose.util.BoxType
+import com.example.wordlecompose.util.FlipType
 import kotlin.math.abs
 
-enum class BoxType {
-    GAME,
-    KEYBOARD
-}
+
 
 @Composable
 fun LetterIconBox(
@@ -87,11 +86,6 @@ fun LetterIconBox(
             }
         }
     }
-}
-
-
-enum class FlipType {
-    HORIZONTAL, VERTICAL,
 }
 
 @Composable

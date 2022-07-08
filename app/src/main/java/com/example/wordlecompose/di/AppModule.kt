@@ -4,7 +4,9 @@ import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.core.DataStoreFactory
 import androidx.datastore.core.Serializer
+import androidx.datastore.core.handlers.ReplaceFileCorruptionHandler
 import androidx.datastore.dataStoreFile
+import androidx.datastore.migrations.SharedPreferencesMigration
 import androidx.room.Room
 import com.example.wordlecompose.di.preferences.AppPreferences
 import com.example.wordlecompose.di.preferences.AppPreferencesSerializer
@@ -12,11 +14,15 @@ import com.example.wordlecompose.data.database.WordDAO
 import com.example.wordlecompose.data.database.WordDatabase
 import com.example.wordlecompose.data.repository.WordRepository
 import com.example.wordlecompose.data.repository.WordRepositoryImpl
+import com.example.wordlecompose.di.preferences.WORDLE_PREFERENCES
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import javax.inject.Singleton
 
 @Module
@@ -47,22 +53,11 @@ object AppModule {
 
     @Singleton
     @Provides
-    fun provideAppPreferences(): AppPreferences {
-        return AppPreferences()
-    }
-
-    @Singleton
-    @Provides
-    fun provideSerializer(): Serializer<AppPreferences>{
-        return AppPreferencesSerializer
-    }
-
-    @Singleton
-    @Provides
-    fun provideDataStore(@ApplicationContext context: Context, serializer: Serializer<AppPreferences>): DataStore<AppPreferences>{
+    fun provideDataStore(@ApplicationContext context: Context): DataStore<AppPreferences>{
         return DataStoreFactory.create(
-            serializer = serializer,
-            produceFile = {context.dataStoreFile("wordle-preferences.json")}
+            serializer = AppPreferencesSerializer,
+            scope = CoroutineScope(Dispatchers.IO + SupervisorJob()),
+            produceFile = {context.dataStoreFile(WORDLE_PREFERENCES)}
         )
     }
 }

@@ -1,5 +1,6 @@
 package com.example.wordlecompose.ui.screens
 
+import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateListOf
@@ -14,9 +15,13 @@ import com.example.wordlecompose.di.preferences.AppPreferences
 import com.example.wordlecompose.ui.components.model.Key
 import com.example.wordlecompose.ui.states.*
 import com.example.wordlecompose.util.DateHandler
+import com.example.wordlecompose.util.GameDates
+import com.example.wordlecompose.util.GameResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.random.Random
@@ -54,15 +59,17 @@ class GameScreenViewModel @Inject constructor(
     private val _keyboardKeys = mutableStateListOf<Key>()
     val keyboardKeys = _keyboardKeys
 
-    private val _isGameWon = mutableStateOf(false)
-    val isGameWon = _isGameWon
+    private val _isGameEnd = mutableStateOf(false)
+    val isGameEnd = _isGameEnd
 
-    //val preferences: Flow<AppPreferences> = dataStore.data
+    private val _gameResult = mutableStateOf(GameResult.GUESSED)
+    val gameResult = _gameResult
+
+    private val _dates = mutableStateOf(GameDates())
 
     init {
         viewModelScope.launch {
-            getWordForToday()
-            updateDate()
+            checkIfDatesMatch()
         }
         ('A'..'Z').forEach { letter ->
             _keyboardKeys.add(Key(letter = letter, bgColor = mutableStateOf(Color.Transparent)))
@@ -117,60 +124,60 @@ class GameScreenViewModel @Inject constructor(
                                     rowErrorState = _rowErrorStates.value.row6Error
                                 )
                             }
-                            else -> {
-
-                            }
+                            else -> {}
                         }
                     }
                 }
             }
             is GameScreenEvent.EnteredWord -> {
-                when (_currentRow.value) {
-                    1 -> {
-                        _textInputState.value += event.input.uppercase()
-                        _inputStates.value = _inputStates.value.copy(
-                            input1State = _textInputState.value
-                        )
-                        println(_textInputState.value)
-                    }
+                if (_gameResult.value == GameResult.GUESSED) {
+                    when (_currentRow.value) {
+                        1 -> {
+                            _textInputState.value += event.input.uppercase()
+                            _inputStates.value = _inputStates.value.copy(
+                                input1State = _textInputState.value
+                            )
+                            println(_textInputState.value)
+                        }
 
-                    2 -> {
-                        _textInputState.value += event.input.uppercase()
-                        _inputStates.value = _inputStates.value.copy(
-                            input2State = _textInputState.value
-                        )
-                    }
+                        2 -> {
+                            _textInputState.value += event.input.uppercase()
+                            _inputStates.value = _inputStates.value.copy(
+                                input2State = _textInputState.value
+                            )
+                        }
 
-                    3 -> {
-                        _textInputState.value += event.input.uppercase()
-                        _inputStates.value = _inputStates.value.copy(
-                            input3State = _textInputState.value
-                        )
-                    }
+                        3 -> {
+                            _textInputState.value += event.input.uppercase()
+                            _inputStates.value = _inputStates.value.copy(
+                                input3State = _textInputState.value
+                            )
+                        }
 
-                    4 -> {
-                        _textInputState.value += event.input.uppercase()
-                        _inputStates.value = _inputStates.value.copy(
-                            input4State = _textInputState.value.uppercase()
-                        )
-                    }
+                        4 -> {
+                            _textInputState.value += event.input.uppercase()
+                            _inputStates.value = _inputStates.value.copy(
+                                input4State = _textInputState.value.uppercase()
+                            )
+                        }
 
-                    5 -> {
-                        _textInputState.value += event.input.uppercase()
-                        _inputStates.value = _inputStates.value.copy(
-                            input5State = _textInputState.value
-                        )
-                    }
+                        5 -> {
+                            _textInputState.value += event.input.uppercase()
+                            _inputStates.value = _inputStates.value.copy(
+                                input5State = _textInputState.value
+                            )
+                        }
 
-                    6 -> {
-                        _textInputState.value += event.input.uppercase()
-                        _inputStates.value = _inputStates.value.copy(
-                            input6State = _textInputState.value
-                        )
-                    }
+                        6 -> {
+                            _textInputState.value += event.input.uppercase()
+                            _inputStates.value = _inputStates.value.copy(
+                                input6State = _textInputState.value
+                            )
+                        }
 
-                    else -> {
+                        else -> {
 
+                        }
                     }
                 }
             }
@@ -221,7 +228,7 @@ class GameScreenViewModel @Inject constructor(
                 }
             }
             GameScreenEvent.ClosedWinDialog -> {
-                _isGameWon.value = false
+                _isGameEnd.value = false
             }
         }
     }
@@ -242,8 +249,57 @@ class GameScreenViewModel @Inject constructor(
         }
     }
 
-    private suspend fun getWordForToday() {
+    private suspend fun updateLastDate(){
+
+        val currentDate = DateHandler.getCurrentDate()
+
+        println("UPDATING LAST DATE WITH $currentDate")
+
+        dataStore.updateData {
+            if (it.lastPlayedDate != null) {
+                AppPreferences(lastPlayedDate = it.date)
+            } else {
+                it.copy(
+                    lastPlayedDate = currentDate
+                )
+            }
+        }
+
+        println("DATE: ${dataStore.data.first().date}")
+        println("LAST DATE: ${dataStore.data.first().lastPlayedDate}")
+    }
+
+    private suspend fun checkIfDatesMatch(){
+
+        println("START")
+
         _isLoading.value = true
+
+        updateDate()
+
+        println("UPDATED")
+
+        val preferences: Flow<AppPreferences> = dataStore.data
+        _dates.value = _dates.value.copy(
+            currentDate = preferences.first().date,
+            lastDate = preferences.first().lastPlayedDate
+        )
+
+        println("CURRENT DATE: ${_dates.value.currentDate}")
+        println("LAST DATE: ${_dates.value.lastDate}")
+
+        if(_dates.value.currentDate != _dates.value.lastDate){
+            getWordForToday()
+            _isLoading.value = false
+            return
+        }
+
+        _isLoading.value = false
+        _isGameEnd.value = true
+        _gameResult.value = GameResult.GUESSED
+    }
+
+    private suspend fun getWordForToday() {
 
         val rowCount = repository.getRowCount()
         _wordState.value = _wordState.value.copy(
@@ -256,8 +312,6 @@ class GameScreenViewModel @Inject constructor(
         )
 
         println(_wordState.value.word)
-
-        _isLoading.value = false
     }
 
 
@@ -322,13 +376,23 @@ class GameScreenViewModel @Inject constructor(
         }
     }
 
-    private fun checkWinConditions() {
-        if (_wordState.value.word != _textInputState.value) {
-            _isGameWon.value = false
+    private suspend fun checkWinConditions() {
+
+        if(_wordState.value.word != _textInputState.value && _currentRow.value == 6){
+            _gameResult.value = GameResult.DEFEAT
+            _isGameEnd.value = true
+            updateLastDate()
             return
         }
-        _isGameWon.value = true
-        println(_isGameWon.value)
+
+        if (_wordState.value.word != _textInputState.value) {
+            return
+        }
+
+        _gameResult.value = GameResult.WIN
+        _isGameEnd.value = true
+        updateLastDate()
+
     }
 
     private suspend fun checkIfWordExists(inputWord: String): Boolean {
