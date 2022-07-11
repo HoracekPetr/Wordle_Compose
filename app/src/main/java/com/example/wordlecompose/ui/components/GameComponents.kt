@@ -1,5 +1,6 @@
 package com.example.wordlecompose.ui.components
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -72,9 +73,10 @@ fun GameEndDialog(
     gameResult: GameResult,
     todayWord: String,
     onDismissRequest: () -> Unit,
-    onCloseButtonClick: () -> Unit
-
+    onCloseButtonClick: () -> Unit,
+    onCloseAndEndGameClick: () -> Unit
 ) {
+
     Dialog(onDismissRequest = { onDismissRequest() }) {
         Surface(
             shape = MaterialTheme.shapes.large,
@@ -94,7 +96,8 @@ fun GameEndDialog(
                         GameResult.DEFEAT -> {
                             Color(211, 47, 47, 255)
                         }
-                        else -> {Color(0, 0, 0, 255)
+                        else -> {
+                            Color(0, 0, 0, 255)
                         }
                     },
                     imageVector = when (gameResult) {
@@ -136,7 +139,13 @@ fun GameEndDialog(
 
                 Spacer(modifier = Modifier.size(12.dp))
                 Button(
-                    onClick = { onCloseButtonClick() },
+                    onClick = {
+                        if (gameResult == GameResult.GUESSED) {
+                            onCloseAndEndGameClick()
+                        } else {
+                            onCloseButtonClick()
+                        }
+                    },
                     shape = MaterialTheme.shapes.medium,
                     colors = ButtonDefaults.buttonColors(
                         backgroundColor = when (gameResult) {
@@ -147,22 +156,24 @@ fun GameEndDialog(
                                 Color(211, 47, 47, 255)
                             }
                             else -> {
-                                Color(0,0,0,255)
+                                Color(0, 0, 0, 255)
                             }
                         }
                     )
                 ) {
-                    Text(text = when(gameResult) {
-                        GameResult.WIN -> {
-                            stringResource(id = R.string.awesome)
-                        }
-                        GameResult.DEFEAT -> {
-                            stringResource(id = R.string.okay)
-                        }
-                        else -> {
-                            stringResource(id = R.string.undestood)
-                        }
-                    }, color = Color.White)
+                    Text(
+                        text = when (gameResult) {
+                            GameResult.WIN -> {
+                                stringResource(id = R.string.awesome)
+                            }
+                            GameResult.DEFEAT -> {
+                                stringResource(id = R.string.okay)
+                            }
+                            else -> {
+                                stringResource(id = R.string.undestood)
+                            }
+                        }, color = Color.White
+                    )
                 }
             }
         }

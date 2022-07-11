@@ -1,6 +1,5 @@
 package com.example.wordlecompose.ui.screens
 
-import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateListOf
@@ -15,12 +14,9 @@ import com.example.wordlecompose.di.preferences.AppPreferences
 import com.example.wordlecompose.ui.components.model.Key
 import com.example.wordlecompose.ui.states.*
 import com.example.wordlecompose.util.DateHandler
-import com.example.wordlecompose.util.GameDates
 import com.example.wordlecompose.util.GameResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -65,7 +61,8 @@ class GameScreenViewModel @Inject constructor(
     private val _gameResult = mutableStateOf(GameResult.GUESSED)
     val gameResult = _gameResult
 
-    private val _dates = mutableStateOf(GameDates())
+    private val _currentDate = mutableStateOf<String?>(null)
+    val currentDate = _currentDate
 
     init {
         viewModelScope.launch {
@@ -234,62 +231,53 @@ class GameScreenViewModel @Inject constructor(
     }
 
 
-    private suspend fun updateDate() {
+/*    private suspend fun checkDate() {
 
         val currentDate = DateHandler.getCurrentDate()
 
         dataStore.updateData {
-            if (it.date != null) {
-                AppPreferences(date = it.date)
-            } else {
+            if(it.date == null) {
+                _isGameEnd.value = false
+                _gameResult.value = GameResult.GUESSED
                 it.copy(
                     date = currentDate
                 )
-            }
-        }
-    }
-
-    private suspend fun updateLastDate(){
-
-        val currentDate = DateHandler.getCurrentDate()
-
-        println("UPDATING LAST DATE WITH $currentDate")
-
-        dataStore.updateData {
-            if (it.lastPlayedDate != null) {
-                AppPreferences(lastPlayedDate = it.date)
             } else {
+                if(it.date == currentDate){
+                    _isGameEnd.value = true
+                    _gameResult.value = GameResult.GUESSED
+                }
                 it.copy(
-                    lastPlayedDate = currentDate
+                    date = it.date
                 )
             }
         }
+    }*/
 
-        println("DATE: ${dataStore.data.first().date}")
-        println("LAST DATE: ${dataStore.data.first().lastPlayedDate}")
+    private suspend fun updateDateToCurrent(){
+        dataStore.updateData {
+            it.copy(
+                date = DateHandler.getCurrentDate()
+            )
+        }
     }
+
 
     private suspend fun checkIfDatesMatch(){
 
-        println("START")
-
         _isLoading.value = true
 
-        updateDate()
+        //checkDate()
 
-        println("UPDATED")
+        val preferences = dataStore.data.first()
 
-        val preferences: Flow<AppPreferences> = dataStore.data
-        _dates.value = _dates.value.copy(
-            currentDate = preferences.first().date,
-            lastDate = preferences.first().lastPlayedDate
-        )
+        _currentDate.value = preferences.date
 
-        println("CURRENT DATE: ${_dates.value.currentDate}")
-        println("LAST DATE: ${_dates.value.lastDate}")
+        println("CURRENT DATE: ${_currentDate.value}")
 
-        if(_dates.value.currentDate != _dates.value.lastDate){
-            getWordForToday()
+        getWordForToday()
+
+        if(_currentDate.value != DateHandler.getCurrentDate() || _currentDate.value == null){
             _isLoading.value = false
             return
         }
@@ -381,7 +369,7 @@ class GameScreenViewModel @Inject constructor(
         if(_wordState.value.word != _textInputState.value && _currentRow.value == 6){
             _gameResult.value = GameResult.DEFEAT
             _isGameEnd.value = true
-            updateLastDate()
+            updateDateToCurrent()
             return
         }
 
@@ -389,10 +377,10 @@ class GameScreenViewModel @Inject constructor(
             return
         }
 
+
         _gameResult.value = GameResult.WIN
         _isGameEnd.value = true
-        updateLastDate()
-
+        updateDateToCurrent()
     }
 
     private suspend fun checkIfWordExists(inputWord: String): Boolean {

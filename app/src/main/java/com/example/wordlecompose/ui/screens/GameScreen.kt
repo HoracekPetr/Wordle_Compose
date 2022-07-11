@@ -1,5 +1,6 @@
 package com.example.wordlecompose.ui.screens
 
+import android.app.Activity
 import androidx.compose.animation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
@@ -23,6 +24,7 @@ import com.example.wordlecompose.ui.components.LetterRowColumn
 
 @Composable
 fun GameScreen(
+    activity: Activity,
     viewModel: GameScreenViewModel = hiltViewModel(),
 ) {
 
@@ -50,7 +52,8 @@ fun GameScreen(
                         gameResult = gameResult,
                         todayWord = viewModel.wordState.value.word ?: "ERROR",
                         onDismissRequest = { viewModel.onEvent(GameScreenEvent.ClosedWinDialog) },
-                        onCloseButtonClick = {viewModel.onEvent(GameScreenEvent.ClosedWinDialog)}
+                        onCloseButtonClick = {viewModel.onEvent(GameScreenEvent.ClosedWinDialog)},
+                        onCloseAndEndGameClick = {activity.finish()}
                     )
                 }
 

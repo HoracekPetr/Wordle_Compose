@@ -8,8 +8,7 @@ import java.io.OutputStream
 
 @Serializable
 data class AppPreferences(
-    val date: String? = null,
-    val lastPlayedDate: String? = null
+    val date: String? = null
 )
 
 object AppPreferencesSerializer : Serializer<AppPreferences> {
